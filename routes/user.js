@@ -15,6 +15,7 @@ router.route("/login")
     .get(logIn)//Form for login
     .post(saveRedirectUrl,passport.authenticate('local',{failureRedirect: '/login',failureFlash : true}), wrapAsync(LoggedIn));//Login Route Execution
 
+router.get("/",signUp);
 //LogOut Route Execution
 router.get("/logout",logOut);
 
