@@ -6,6 +6,7 @@ const passport = require("passport");
 const { saveRedirectUrl } = require("../middleware");
 const { signUp, signedUp, logIn, LoggedIn, logOut } = require("../controllers/userInfo");
 
+router.get("/",signUp);
 
 router.route("/signup")
     .get(signUp)//Form for Signup
@@ -15,7 +16,6 @@ router.route("/login")
     .get(logIn)//Form for login
     .post(saveRedirectUrl,passport.authenticate('local',{failureRedirect: '/login',failureFlash : true}), wrapAsync(LoggedIn));//Login Route Execution
 
-router.get("/",signUp);
 //LogOut Route Execution
 router.get("/logout",logOut);
 
