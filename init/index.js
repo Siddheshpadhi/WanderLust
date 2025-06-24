@@ -19,7 +19,7 @@ main()
 
 async function main() {
     try{
-        await mongoose.connect("mongodb://127.0.0.1:27017/Wanderlust");
+        await mongoose.connect(process.env.ATLASDB_URL);
     }catch(err){
         console.log(err);
     }
@@ -27,19 +27,28 @@ async function main() {
 
 async function initDB() {
     await Listing.deleteMany({});
-    const dat = initData.data.map((obj) => ({...obj,owner: '6819f9744b299abdf4648cf0'}));
-    for(oneDat of dat){
-        let response = await geocodingClient.forwardGeocode({
-        query: oneDat.location,
-        limit: 1
-        }).send()
-        let newListing = new Listing(oneDat);
-        console.log(response.body.features[0].geometry);
-        newListing.geometry = response.body.features[0].geometry;
-        await newListing.save();
+    try {
+        const dat = initData.data.map((obj) => ({...obj,owner: '6819f9744b299abdf4648cf0'}));
+        for(oneDat of dat){
+            let response = await geocodingClient.forwardGeocode({
+            query: oneDat.location,
+            limit: 1
+            }).send()
+            let newListing = new Listing(oneDat);
+            // console.log(response.body.features[0].geometry);
+            newListing.geometry = response.body.features[0].geometry;
+            oneDat.geometry = response.body.features[0].geometry;
+            // console.log(newListing);
+            await newListing.save();
+            oneDat = newListing;
+            }
+        console.log(dat);
+        await Listing.insertMany(dat);
+        console.log("data is reinitialized");
+    } catch (error) {
+        console.log(error);
     }
-    await Listing.insertMany(dat);
-    console.log("data is reinitialized");
+    
 }
 
 initDB();
